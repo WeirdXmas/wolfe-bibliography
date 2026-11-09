@@ -29,14 +29,28 @@ def about_wolfe(title, venue):
     return bool(ABOUT.search(t)) or (bool(re.search(r"\bwolfe\b", t, re.I)) and bool(SF_VENUE.search(venue or "")))
 
 
+LIMITED = set()   # hosts that rate-limited us this run: skip them instead of waiting
+
+
 def get(url):
-    for k in range(3):
+    host = urllib.parse.urlparse(url).netloc
+    if host in LIMITED:
+        return None
+    for k in range(2):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40) as r:
                 return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            print(f"warn: {e} on {url[:100]}", file=sys.stderr)
+            if e.code == 429:
+                if k:   # second 429: give up on this host for the rest of the run
+                    LIMITED.add(host)
+                    print(f"warn: {host} is rate-limiting this machine; skipping it", file=sys.stderr)
+                    return None
+                time.sleep(15)
         except (urllib.error.URLError, TimeoutError) as e:
             print(f"warn: {e} on {url[:100]}", file=sys.stderr)
-            time.sleep(5 * (k + 1))
+            time.sleep(5)
     return None
 
 
@@ -75,7 +89,8 @@ def main():
                  "authors": [f"{x.get('given', '')} {x.get('family', '')}".strip() for x in it.get("author") or []]})
         time.sleep(1)
     json.dump(out, sys.stdout, ensure_ascii=False, indent=1)
-    print(f"\n{len(out)} Wolfe-titled records since {since}", file=sys.stderr)
+    print(f"\n{len(out)} Wolfe-titled records since {since}"
+          + (f"; rate-limited and skipped: {', '.join(sorted(LIMITED))}" if LIMITED else ""), file=sys.stderr)
 
 
 if __name__ == "__main__":

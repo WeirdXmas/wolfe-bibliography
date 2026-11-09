@@ -25,10 +25,12 @@ Exclude:
 3. **Gmail:** only search `label:wolfe-alerts`, or mail from `scholaralerts-noreply@google.com` or `noreply@ebsco.com`. Never open, search or mention any other email. If Gmail isn't available, skip it and say so in the PR.
 4. Change only `discovery/candidates/` and `discovery/seen.json` (never `feeds.txt`). Don't touch `data/`, `reports/` or the site files.
 5. If you find nothing new, don't open a PR. Just finish with a one-line summary.
+6. **Do every step below, even when the early ones find nothing.** In particular, run at least 8 varied web searches (step 4), check ISFDB, and check at least four journals' latest tables of contents. In the final summary, list each step and what it returned.
+7. Run long commands in the background, or with `timeout 300`, so one slow source can't stall the run.
 
 ## Steps
 
-1. `python3 discovery/search_open.py --days 120 > /tmp/open.json`: OpenAlex and Crossref records from the last 120 days whose title is about Wolfe.
+1. `timeout 300 python3 discovery/search_open.py --days 120 > /tmp/open.json`: OpenAlex and Crossref records from the last 120 days whose title is about Wolfe. If OpenAlex rate-limits the machine, the script skips it and continues with Crossref. Report that under "Sources checked".
 2. **Gmail alerts**, if the Gmail tool is available:
    - Search `label:wolfe-alerts newer_than:9d`. Also try `from:(scholaralerts-noreply@google.com OR noreply@ebsco.com) newer_than:9d` in case the label filter missed something.
    - From each alert, take the listed items: title, authors, venue, year and link. Ignore setup, confirmation and modification notices.
@@ -37,7 +39,7 @@ Exclude:
    - `"Gene Wolfe"` with essay / review / criticism / substack, plus the current month and year
    - specific works: "Book of the New Sun", "Fifth Head of Cerberus", "Peace" Wolfe, Latro, "Long Sun", "Short Sun", "Wizard Knight", "There Are Doors", "Castleview", "Free Live Free", "An Evil Guest", "The Sorcerer's House", "Home Fires", "A Borrowed Man"
    - journal tables of contents: Science Fiction Studies, Extrapolation, Foundation, Journal of the Fantastic in the Arts, New York Review of Science Fiction, Vector, Strange Horizons, Reactor, Los Angeles Review of Books
-   - ISFDB: new essay or review records about Wolfe
+   - ISFDB: fetch `https://www.isfdb.org/cgi-bin/ea.cgi?Gene_Wolfe` (Wolfe's author page) and look at recent essays and reviews about him, or use ISFDB's advanced search for titles containing "Wolfe". Note anything from the last year.
    - Ultan's Library (ultan.org.uk) news, and Michael Andre-Driussi / Sirius Fiction announcements
 4b. **Feeds:** for every URL in `discovery/feeds.txt`, fetch it (`curl -sL -A "Mozilla/5.0" URL`, or WebFetch) and take posts from the last 14 days that are about Wolfe. Feeds are the reliable way to catch Substack and blog posts that web search misses. If you find a new blog or Substack that writes about Wolfe repeatedly, list it under "Suggested feeds" at the end of the candidates file. Don't edit `feeds.txt` yourself.
 4c. **Network:** if a host fails with ENOTFOUND or a proxy 403, the cloud environment is blocking it. Keep going with the other sources, and list every blocked host under "Sources checked" so the owner can allow it.
