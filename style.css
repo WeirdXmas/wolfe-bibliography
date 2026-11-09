@@ -66,3 +66,7 @@ nav .sep { display: inline-block; width: 1px; height: 14px; background: var(--li
         border: 1px solid #cfe0cb; color: var(--green); text-decoration: none; font-style: italic; background: #fff; }
 .chip.main { background: #e0eedd; font-weight: 600; }
 tr.kid td:first-child { padding-left: 26px; }
+.it-sum { font-size: 15px; color: #333; margin: 6px 0 4px; }
+.it-th { margin: 4px 0; }
+.theme { display: inline-block; font: 12px system-ui, sans-serif; padding: 1px 8px; margin: 2px 4px 2px 0; border-radius: 10px; background: #f3efe6; color: #6b5a2e; text-decoration: none; }
+.summary { background: #fff; border-left: 3px solid var(--accent); padding: 4px 16px; margin: 12px 0; }

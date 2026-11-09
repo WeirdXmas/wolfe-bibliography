@@ -124,7 +124,7 @@ function prepCatalog() {
     it.dec = /^\d{4}/.test(it.y || "") ? it.y.slice(0, 3) + "0s" : "";
     it.ncw = (D.works[it.id] || {}).ncw || 0;
     it.hay = [it.ti, it.names.join(" "), it.v, TYPES[it.ty],
-              ...it.ww.map(([w]) => (D.wolfeById[w] || {}).ti)].join(" ").toLowerCase()
+              ...it.ww.map(([w]) => (D.wolfeById[w] || {}).ti), it.sum, ...(it.th || []), ...(it.ap || [])].join(" ").toLowerCase()
               .normalize("NFKD").replace(/[̀-ͯ]/g, "");
   }
 }
@@ -153,6 +153,8 @@ function itemCard(it) {
     <div class="it-meta">${names || '<span class="muted">author unknown</span>'}${it.y ? " · " + esc(it.y) : ""}${it.v ? ` · <i>${esc(it.v)}</i>` : ""}</div>
     <div class="it-tags"><span class="badge type">${esc(TYPES[it.ty] || it.ty)}</span>${st}${it.bib ? '<span class="badge bib">in bibliography</span>' : ""}
       ${it.ncw ? `<span class="small muted">cited by ${it.ncw} work${it.ncw > 1 ? "s" : ""} in the collection</span>` : ""}</div>
+    ${it.sum ? `<div class="it-sum">${esc(it.sum)}</div>` : ""}
+    ${it.th && it.th.length ? `<div class="it-th">${it.th.map(t => `<a class="theme" href="#/search?q=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}${(it.ap || []).length ? `<span class="small muted"> · ${esc(it.ap.join(", "))}</span>` : ""}</div>` : ""}
     ${ww.length ? `<div class="it-wolfe">${ww.slice(0, 8).map(([w, p]) => wchip(w, p)).join("")}${ww.length > 8 ? `<span class="small muted">+${ww.length - 8} more</span>` : ""}</div>` : ""}
   </div>`;
 }
@@ -174,7 +176,7 @@ const NEW_PAGES = {
     return `<h1>Search Wolfe scholarship</h1>
       <p class="small muted">${D.catalog.length} pieces of writing about Gene Wolfe: criticism, reviews, interviews, theses, books and web essays.
       ${D.catalog.filter(i => i.ft).length} are in our collection in full; the rest come from the bibliography, from citations in those works, or from new leads.</p>
-      <div class="searchbar"><input id="sq" type="search" placeholder="title, critic, venue, Wolfe work…" value="${esc(Q.q || "")}" autofocus></div>
+      <div class="searchbar"><input id="sq" type="search" placeholder="title, critic, venue, Wolfe work, theme (e.g. memory, catholicism)…" value="${esc(Q.q || "")}" autofocus></div>
       <div class="filters">
         <select id="sw">${wolfeOptions(Q.w)}</select>
         <select id="st"><option value="">any type</option>${Object.entries(TYPES).map(([k, v]) => opt(k, v, Q.t)).join("")}</select>
@@ -269,7 +271,11 @@ function catBlock(id) {
   const it = D.catById[id];
   if (!it) return "";
   const ww = it.ww.slice().sort((a, b) => b[1] - a[1]);
-  return `<p><span class="badge type">${esc(TYPES[it.ty])}</span>${it.ft ? '<span class="badge corpus">full text in collection</span>' : it.st ? `<span class="badge">${esc(it.st.replace("_", " "))}</span>` : ""}</p>
+  const sum = it.sum ? `<div class="summary"><p>${esc(it.sum)}</p>
+      <p class="small">${(it.th || []).map(t => `<a class="theme" href="#/search?q=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}
+      ${(it.ap || []).length ? `<span class="muted">Approach: ${esc(it.ap.join(", "))}</span>` : ""}</p>
+      <p class="small muted">Summary written by Claude (Anthropic) from the full text, in its own words; check the original before citing.</p></div>` : "";
+  return sum + `<p><span class="badge type">${esc(TYPES[it.ty])}</span>${it.ft ? '<span class="badge corpus">full text in collection</span>' : it.st ? `<span class="badge">${esc(it.st.replace("_", " "))}</span>` : ""}</p>
     ${ww.length ? `<p class="small">Discusses: ${ww.map(([w, p]) => wchip(w, p)).join("")}</p>` : ""}`;
 }
 
