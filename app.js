@@ -8,7 +8,7 @@ const EPISODES = {cyriaca: "Cyriaca's story", talos_play: "Talos's play", brown_
 const STANCE = {agrees: "agrees", disagrees: "disagrees", builds_on: "builds on", neutral: "neutral", unclear: ""};
 
 async function load() {
-  const names = ["works", "authors", "cites", "episodes", "missing", "meta"];
+  const names = ["works", "authors", "cites", "episodes", "missing", "wanted", "meta"];
   const got = await Promise.all(names.map(n => fetch(`data/${n}.json`).then(r => r.json())));
   names.forEach((n, i) => D[n] = got[i]);
   D.inc = {}; D.out = {}; D.aCites = {}; D.byAuthor = {};
@@ -193,6 +193,29 @@ const pages = {
       <div class="filters"><input type="text" id="mf" placeholder="filter"><label><input type="checkbox" id="mw" checked> Wolfe-related only</label></div><div id="mt"></div>`;
   },
 
+  wanted() {
+    const W = D.wanted, c = s => W.filter(r => r.src === s).length;
+    const done = W.filter(r => r.st === "obtained").length, open = W.filter(r => r.st === "wanted");
+    const c2 = s => open.filter(r => r.src === s).length;
+    return `<h1>Wanted: full texts</h1>
+      <p>Works whose full text is not yet in the corpus, so their own citations can't be added to the graph.
+      When a copy is found and processed, the work joins the corpus and leaves this list.</p>
+      <div class="stats">
+        <div class="stat"><b>${c2("bibliography")}</b><span>in the bibliography, no copy yet</span></div>
+        <div class="stat"><b>${c2("cited")}</b><span>cited by 2+ corpus works, not in the bibliography</span></div>
+        <div class="stat"><b>${c2("discovered")}</b><span>new leads from database & web searches</span></div>
+        <div class="stat"><b>${done}</b><span>obtained, awaiting processing</span></div>
+      </div>
+      <div class="filters"><input type="text" id="qf" placeholder="filter">
+        <label>source <select id="qs"><option value="">all</option><option value="bibliography">bibliography</option>
+          <option value="cited">cited, not in bibliography</option><option value="discovered">new leads</option></select></label>
+        <label>status <select id="qt"><option value="">all</option><option value="wanted" selected>wanted</option>
+          <option value="requested">requested</option><option value="obtained">obtained</option><option value="in_corpus">in corpus (reprinted)</option><option value="unavailable">unavailable</option></select></label>
+        <label><input type="checkbox" id="qw"> hide web posts</label></div>
+      <div id="qtab"></div>
+      <p class="small muted">Priority = number of corpus works that cite the item. New leads have not been cited yet; they are sorted by year.</p>`;
+  },
+
   reports() {
     const R = {centrality: "Centrality: most-cited works, brokers and critics", primary_attention: "Attention to Wolfe's works",
                timeline: "Timeline: citations by decade", orphans: "Orphans: works nobody cites"};
@@ -277,6 +300,25 @@ const after = {
         {h: "Citing works", n: 1, f: r => r.n_citing_works, s: r => +r.n_citing_works}], {sort: 4});
     };
     ["#mf", "#mw"].forEach(s => $(s).oninput = upd); upd();
+  },
+  wanted() {
+    const SRC = {bibliography: "bibliography", cited: "cited", discovered: "new lead"};
+    const ST = {wanted: "", requested: "badge bib", obtained: "badge wolfe", in_corpus: "badge corpus", unavailable: "badge"};
+    const upd = () => {
+      const q = $("#qf").value.toLowerCase(), s = $("#qs").value, t = $("#qt").value, hw = $("#qw").checked;
+      const rows = D.wanted.filter(r => (!s || r.src === s) && (!t || r.st === t) && (!hw || r.k !== "web") &&
+        (!q || (r.ti + r.a + r.v).toLowerCase().includes(q)));
+      $("#qtab").innerHTML = table(rows, [
+        {h: "Title", f: r => (r.w ? wlink(r.w).replace(/>[^<]*</, ">" + esc(r.ti) + "<") : r.url ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.ti)}</a>` : esc(r.ti))
+            + (r.n ? `<div class="small muted">${esc(r.n)}</div>` : ""), s: r => r.ti.toLowerCase()},
+        {h: "Author", f: r => esc(r.a), s: r => (r.a || "~").toLowerCase()},
+        {h: "Year", f: r => esc(r.y), s: r => r.y || ""},
+        {h: "In", f: r => `<i>${esc(r.v)}</i>`, s: r => r.v || ""},
+        {h: "Source", f: r => `<span class="badge">${SRC[r.src]}</span>${r.k ? ` <span class="small muted">${esc(r.k)}</span>` : ""}`, s: r => r.src},
+        {h: "Status", f: r => r.st === "wanted" ? `<span class="small muted">wanted</span>` : `<span class="${ST[r.st]}">${esc(r.st.replace("_", " "))}</span>`, s: r => r.st},
+        {h: "Priority", n: 1, f: r => r.ncw || "", s: r => r.ncw * 10000 + (+String(r.y).slice(0, 4) || 0) / 10}], {sort: 6, limit: 500});
+    };
+    ["#qf", "#qs", "#qt", "#qw"].forEach(s => $(s).oninput = upd); upd();
   },
   graph: drawGraph,
 };

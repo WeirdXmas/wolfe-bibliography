@@ -8,12 +8,14 @@ The site is static: open `index.html` through any web server, or browse it on Gi
 
 | Path | Contents |
 |---|---|
-| `index.html`, `app.js`, `style.css` | the browser app (D3 for the graph view, marked for the reports) |
+| `index.html`, `app.js`, `style.css` | the browser app (D3 for the graph view, marked for the reports; both bundled in `lib/`) |
 | `data/works.json` | works: title, authors, year, container, flags (in corpus, in bibliography, about Wolfe) |
 | `data/authors.json` | author IDs and display names |
 | `data/cites.json` | one row per citation or mention: citing work, cited work and authors, page, locator, a context under 50 words, method, confidence, match status |
 | `data/episodes.json` | short passages discussing selected embedded stories (Cyriaca, Talos's play, the Brown Book, the lazaret contest) |
 | `data/missing.json` | works cited in the corpus but absent from the project bibliography |
+| `data/wanted.json` | works whose full text is still being sought (the **Wanted** page), with status |
+| `lib/` | bundled copies of D3 v7 and marked v12 (no CDN needed) |
 | `reports/*.md` | centrality, orphans, attention to Wolfe's works, timeline |
 
 ## How it was made
