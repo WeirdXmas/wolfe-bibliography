@@ -1,0 +1,14 @@
+# Blogs, Substacks and sites with Wolfe writing, checked directly every run (RSS/Atom unless noted).
+# One URL per line; '#' starts a comment. Add freely.
+https://ultan.org.uk/feed/                                   # Ultan's Library (Wolfe studies site)
+https://litandchess.substack.com/feed                        # Andy Lee, Lit & Chess (Peace essay)
+https://getliterate.substack.com/feed                        # Nye Canham (BotNS, BookTok essay)
+https://radicaledward.substack.com/feed                      # BotNS slow read
+https://countercraft.substack.com/feed                       # Lincoln Michel, Counter Craft
+https://floydholland.substack.com/feed                       # Floyd Holland
+https://camillelebromley.substack.com/feed                   # Know-It-All zine (Nicholas Russell essay)
+https://benbishop.substack.com/feed                          # Ben Bishop
+https://synthesizedsunsets.substack.com/feed                 # Synthesized Sunsets
+https://donbeck1.substack.com/feed                           # Don Beck
+https://freethoughtblogs.com/atrivialknot/feed/              # A Trivial Knot (rereads)
+https://www.goodreads.com/author/show/52075.Michael_Andre_Driussi/blog   # Andre-Driussi blog (HTML page, not a feed)
