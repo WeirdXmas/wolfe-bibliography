@@ -72,3 +72,4 @@ tr.kid td:first-child { padding-left: 26px; }
 .summary { background: #fff; border-left: 3px solid var(--accent); padding: 4px 16px; margin: 12px 0; }
 .fulltext { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; margin: 12px 0; }
 .fulltext ul { margin: 4px 0; padding-left: 18px; }
+.biblist { padding-left: 22px; } .biblist li { margin: 6px 0 10px; } .biblist .bl { margin-top: 2px; }

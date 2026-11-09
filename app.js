@@ -194,7 +194,43 @@ function wolfeOptions(sel) {
       `<option value="${w.id}" ${w.id === sel ? "selected" : ""}>${w.part ? "  " : ""}${esc(w.ti)}${w.y ? " (" + esc(w.y) + ")" : ""}</option>`).join("")}</optgroup>`).join("");
 }
 
+// ---------- formatted bibliography (Chicago-style notes-bibliography form, from the fields we have)
+function bibEntry(it) {
+  const names = (it.as || it.names.join("; ") || "").split(/\s*;\s*/).filter(Boolean);
+  const au = names.length > 3 ? names[0] + ", et al." : names.length > 1 ? names.slice(0, -1).join("; ") + ", and " + names.slice(-1) : names[0] || "";
+  const ti = it.ti || "(untitled)";
+  const book = it.ty === "book" || it.ty === "thesis";
+  let s = au ? esc(au.replace(/\.$/, "")) + ". " : "";
+  s += book ? `<i>${esc(ti)}</i>. ` : `“${esc(ti.replace(/\.$/, ""))}.” `;
+  if (it.v) s += `<i>${esc(it.v)}</i>${it.vi ? " " + esc(it.vi) : ""}`;
+  if (it.ty === "thesis" && !it.v) s += "Thesis";
+  if (it.pub) s += (it.v ? ". " : "") + esc(it.pub);
+  s += it.y ? (it.v && !it.pub ? ` (${esc(it.y)})` : `${it.v || it.pub ? ", " : ""}${esc(it.y)}`) : (it.v || it.pub ? ", n.d." : "n.d.");
+  if (it.pp) s += `: ${esc(it.pp)}`;
+  s = s.replace(/\s+\./g, ".");
+  return /[.?!]$/.test(s) ? s : s + ".";
+}
+function bibLinks(it) {
+  const out = [];
+  const ds = D.priv && D.priv.works[it.id];
+  if (ds) ds.forEach((e, i) => { const l = pageLinks(e.doc, null); if (l) out.push((ds.length > 1 ? `<span class="muted">${i + 1}:</span> ` : "") + l); });
+  if (it.url) out.push(`<a href="${esc(it.url)}" target="_blank" rel="noopener">online ↗</a>`);
+  if (D.works[it.id]) out.push(`<a href="#/work/${encodeURIComponent(it.id)}">record</a>`);
+  return out.join(" · ");
+}
+
 const NEW_PAGES = {
+  bibliography() {
+    return `<h1>Bibliography of Gene Wolfe scholarship</h1>
+      <p class="small muted">Every piece of writing about Wolfe the project knows of, formatted from the metadata we have. Fields the sources don't give are left out, never filled in, so check the original before citing.
+      ${D.priv ? "Links open the full text in our collection." : "Full texts are available only in the private copy."}</p>
+      <div class="filters">
+        <label>group by <select id="bg"><option value="author">author</option><option value="year">year</option><option value="type">type</option><option value="wolfe">Wolfe work (main subject)</option></select></label>
+        <label>include <select id="bs"><option value="core">collection + bibliography + leads</option><option value="all">also works known only from citations</option><option value="ft">full text in collection only</option></select></label>
+        <input type="text" id="bq" placeholder="filter">
+        <a href="#" id="bdl" class="small">download as text</a>
+      </div><p id="bn" class="small muted"></p><div id="bib"></div>`;
+  },
   fulltext() {
     if (!D.priv) return `<p>Full-text search is only available in the private copy.</p>`;
     return `<h1>Search the full texts</h1><p class="small muted">Searches the OCR text of every work in the collection. Each hit opens the text at that page; from there, "original ↗" opens the PDF at the same page.</p><div id="pf"></div>`;
@@ -273,6 +309,42 @@ const NEW_PAGES = {
 };
 
 const NEW_AFTER = {
+  bibliography() {
+    const sortKey = it => ((it.as || it.names[0] || "zzzz").toLowerCase().replace(/^[^a-z]+/, "") + " " + (it.y || "9999") + (it.ti || "")).normalize("NFKD");
+    let shown = [];
+    const upd = () => {
+      const g = $("#bg").value, sc = $("#bs").value, q = $("#bq").value.toLowerCase();
+      let rows = D.catalog.filter(it => sc === "all" || (sc === "ft" ? it.ft : it.src !== "cited"));
+      if (q) rows = rows.filter(it => it.hay.includes(q) || (it.as || "").toLowerCase().includes(q));
+      rows.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+      const groups = new Map(), add = (k, it) => { if (!groups.has(k)) groups.set(k, []); groups.get(k).push(it); };
+      rows.forEach(it => {
+        if (g === "author") add(((it.as || it.names[0] || "?").replace(/^[^A-Za-zÀ-ž]+/, "")[0] || "?").toUpperCase(), it);
+        else if (g === "year") add(it.dec || "Undated", it);
+        else if (g === "type") add(TYPES[it.ty], it);
+        else { const m = it.ww.filter(([, p]) => p > 1).map(([w]) => w); (m.length ? m : ["_none"]).forEach(w => add(w, it)); }
+      });
+      let keys = [...groups.keys()];
+      if (g === "wolfe") keys.sort((a, b) => a === "_none" ? 1 : b === "_none" ? -1 : ((D.wolfeById[a] || {}).y || "").localeCompare((D.wolfeById[b] || {}).y || ""));
+      else keys.sort((a, b) => a === "Undated" ? 1 : b === "Undated" ? -1 : a.localeCompare(b));
+      const label = k => g === "wolfe" ? (k === "_none" ? "General / not tagged" : `<i>${esc(D.wolfeById[k].ti)}</i> (${esc(D.wolfeById[k].y)})`) : esc(k);
+      shown = keys.map(k => [k, groups.get(k)]);
+      $("#bn").textContent = `${rows.length} entries`;
+      $("#bib").innerHTML = shown.map(([k, its]) => `<h2>${label(k)}</h2><ol class="biblist">${its.map(it =>
+        `<li>${bibEntry(it)} <span class="badge type">${esc(TYPES[it.ty])}</span>${it.ft ? '<span class="badge corpus">full text</span>' : ""}
+          <div class="small bl">${bibLinks(it)}</div></li>`).join("")}</ol>`).join("");
+    };
+    ["#bg", "#bs"].forEach(s => $(s).onchange = upd); $("#bq").oninput = upd;
+    $("#bdl").onclick = e => {
+      e.preventDefault();
+      const tmp = document.createElement("div");
+      const txt = shown.map(([k, its]) => { tmp.innerHTML = g2(k); return tmp.textContent + "\n\n" + its.map(it => { tmp.innerHTML = bibEntry(it); return tmp.textContent + (it.url ? " " + it.url : ""); }).join("\n") }).join("\n\n");
+      function g2(k) { const g = $("#bg").value; return g === "wolfe" ? (k === "_none" ? "General / not tagged" : D.wolfeById[k].ti) : k; }
+      const blob = new Blob([txt + "\n"], {type: "text/plain"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "wolfe-scholarship-bibliography.txt"; a.click();
+    };
+    upd();
+  },
   fulltext() {
     if (!D.priv) return;
     const go = () => new PagefindUI({element: "#pf", showSubResults: true, showImages: false, resetStyles: false});
