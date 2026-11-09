@@ -35,7 +35,7 @@
 - Killheffer 1993, Nightside of the Long Sun
 - Killhoffer 1989, Soldier of Arete by Gene Wolfe
 - Lopez 2015, Art and Allegory: A Method to Read The Book of the New Sun b
-- Malzburg 2005, In Praise of David Drake
+- Malzberg 2005, In Praise of David Drake
 - Marc Aramini 2026, By Sword and Spirit: An Exploration of the Fiction of Gene W
 - McCaffery 1988, Cyberpunk Forum/Symposium
 - Pak n.d., The Dialogic Science Fiction Megatext: Vivisection in H. G. 
@@ -64,7 +64,7 @@
 - Clute 2010, The Socerer’s House by Gene Wolfe
 - Disch 1993, Six Writers in Search of a Genre: Responses to John Kessel's
 - Farrell 2007, The Distant Suns of Gene Wolfe
-- Feeley 1991, Evidence of Things Not Seen
+- Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book
 - French 1983, Gene Wolfe and the Tale of Wonder: The End of the Apprentice
 - Gordon 1989, A Wolfe With Surface Traction: There Are Doors by Gene Wolfe
 - Gouveau 1990, Endangered But Still Vital: Endangered Species by Gene Wolfe
@@ -72,7 +72,7 @@
 - James Sallis n.d., 
 - Killheffer 1993, Nightside of the Long Sun
 - Killhoffer 1989, Soldier of Arete by Gene Wolfe
-- Malzburg 2005, In Praise of David Drake
+- Malzberg 2005, In Praise of David Drake
 - McCaffery 1988, Cyberpunk Forum/Symposium
 - Michael Swanwick n.d., The Wolf in the Labyrinth
 - Pascal J. Thomas n.d., Lake of the Long Sun by Gene Wolfe

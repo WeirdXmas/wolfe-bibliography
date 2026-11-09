@@ -73,7 +73,7 @@ Paragraph-level keyword scan of the counted documents (for NYRSF/scanned clips, 
 - Aramini 2015, Between Light and Shadow — 1 passages (pp. 93)
 - Aramini 2021, Beyond Time and Memory: An Exploration of the Fiction of Gen — 1 passages
 - Borski 2001, Khaibits and Other Shadows: Looking for Severia in the Book  — 1 passages (pp. 2)
-- Feeley 1991, Evidence of Things Not Seen — 1 passages (pp. 6)
+- Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book — 1 passages (pp. 6)
 - Killhoffer 1989, Soldier of Arete by Gene Wolfe — 1 passages (pp. 2)
 - Palumbo 2005, The Monomyth in Gene Wolfe's The Book of the New Sun — 1 passages
 - Wright 2007, Shadows of the New Sun: Wolfe on Writing/Writers on Wolfe — 1 passages (pp. 211)
@@ -92,7 +92,7 @@ Paragraph-level keyword scan of the counted documents (for NYRSF/scanned clips, 
 - Clareson 1982, The Book of Gold’ : Gene Wolfe's Book of the New Sun — 3 passages (pp. 65, 66)
 - Manlove 1984, Terminus Non Est: Gene Wolfe's The Book of the New Sun — 3 passages (pp. 222, 223, 225)
 - Borski 2000, Masks of the Father: Paternity in Gene Wolfe’s Book of the N — 2 passages (pp. 8, 9)
-- Feeley 1991, Evidence of Things Not Seen — 2 passages (pp. 2, 7)
+- Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book — 2 passages (pp. 2, 7)
 - Wright 2007, Shadows of the New Sun: Wolfe on Writing/Writers on Wolfe — 2 passages (pp. 66, 216)
 - Aramini n.d., Does It Mean? Gene Wolfe: Perverse Puzzle Maker — 1 passages
 - Marc Aramini 2026, By Sword and Spirit: An Exploration of the Fiction of Gene W — 1 passages
@@ -142,7 +142,7 @@ Paragraph-level keyword scan of the counted documents (for NYRSF/scanned clips, 
 - Finander 2010, Fantasy, imagination and history : a historiographical study — 1 passages (pp. 223)
 - Garvey n.d., An Examination of Gene Wolfe's The Book of the New Sun: Lite — 1 passages (pp. 37)
 - Heldreth 1995, The Mercy of the Torturer: The Paradox of Compassion in Gene — 1 passages (pp. 2)
-- Feeley 1991, Evidence of Things Not Seen — 1 passages (pp. 2)
+- Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book — 1 passages (pp. 2)
 - Andre-Driussi 2000, In Green’s Jungles by Gene Wolfe — 1 passages (pp. 1)
 - Palumbo 2005, The Monomyth in Gene Wolfe's The Book of the New Sun — 1 passages
 - Wright 2007, Shadows of the New Sun: Wolfe on Writing/Writers on Wolfe — 1 passages (pp. 213)

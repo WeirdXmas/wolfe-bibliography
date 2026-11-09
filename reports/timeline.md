@@ -19,7 +19,7 @@ Citing-work year → cited-work year, counted links between works with known yea
 | 1960s |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | 1970s |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 | 1980s |  | 1 | 1 | 1 |  | 3 | 7 | 2 | 7 | 12 | 8 | 38 | 58 | 136 | 79 |  |  |  | 1 |
-| 1990s |  |  |  |  |  |  |  |  |  | 2 | 1 | 10 | 20 | 52 | 133 | 21 | 5 |  |  |
+| 1990s |  |  |  |  |  |  |  |  |  | 2 | 1 | 10 | 20 | 52 | 134 | 21 | 5 |  |  |
 | 2000s |  |  |  |  | 1 |  | 1 |  | 1 |  |  | 2 | 13 | 41 | 132 | 83 | 24 | 1 |  |
 | 2010s |  | 1 |  |  | 2 |  |  | 4 | 3 | 4 | 1 | 7 | 31 | 54 | 121 | 154 | 161 | 45 |  |
 | 2020s | 2 | 1 |  |  | 1 |  | 5 | 1 | 2 | 1 | 3 | 3 | 5 | 3 | 7 | 13 | 46 | 101 |  |
@@ -38,7 +38,7 @@ Citing-work year → cited-work year, counted links between works with known yea
 - 1990 — Clute 1990, Castleview by Gene Wolfe — cites 0 secondary works; cited by 1
 - 1990 — Gouveau 1990, Endangered But Still Vital: Endangered Species by Gene Wolfe — cites 0 secondary works; cited by 0
 - 1991 — Aichele 1991, Self-Referentiality in Gene Wolfe's 'Seven American Nights — cites 11 secondary works; cited by 1
-- 1991 — Feeley 1991, Evidence of Things Not Seen — cites 0 secondary works; cited by 3
+- 1991 — Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book — cites 0 secondary works; cited by 3
 - 1991 — Gevers 1991, A study of the major science fiction works of — cites 220 secondary works; cited by 2
 - 1993 — Christopher 1993, A Second View of Castleview — cites 2 secondary works; cited by 2
 - 1993 — Disch 1993, Six Writers in Search of a Genre: Responses to John Kessel's — cites 0 secondary works; cited by 0
@@ -70,7 +70,7 @@ Citing-work year → cited-work year, counted links between works with known yea
 - 2004 — Keyes 2004, Only in story a world : atheistic metanarrative in LeGuin, P — cites 28 secondary works; cited by 0
 - 2004 — Pearson 2004, Two Views: The Knight by Gene Wolfe — cites 1 secondary works; cited by 1
 - 2005 — JG 2005, Wolfe Trap — cites 2 secondary works; cited by 0
-- 2005 — Malzburg 2005, In Praise of David Drake — cites 0 secondary works; cited by 0
+- 2005 — Malzberg 2005, In Praise of David Drake — cites 0 secondary works; cited by 0
 - 2005 — Palumbo 2005, The Monomyth in Gene Wolfe's The Book of the New Sun — cites 19 secondary works; cited by 1
 - 2007 — Farrell 2007, The Distant Suns of Gene Wolfe — cites 0 secondary works; cited by 2
 - 2007 — Wright 2007, Shadows of the New Sun: Wolfe on Writing/Writers on Wolfe — cites 12 secondary works; cited by 8

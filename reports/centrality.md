@@ -1,6 +1,6 @@
 # Centrality
 
-Work graph: 1971 works, 2375 citing→cited links (4485 counted citation/mention records). Author graph: 1537 people, 1986 links.
+Work graph: 1971 works, 2375 citing→cited links (4485 counted citation/mention records). Author graph: 1536 people, 1986 links.
 
 In-degree = number of distinct citing works in the corpus. PageRank/betweenness are computed on the secondary-literature graph (Wolfe's own works excluded). `mentions` are informal references found by the LLM pass.
 
@@ -29,7 +29,7 @@ In-degree = number of distinct citing works in the corpus. PageRank/betweenness 
 | 19 | Frye 1957, The Anatomy of Criticism : Four Essays | 4 | 11 | 0 | 0.0005 | False |  |
 | 20 | Manlove 1986, Science Fiction : Ten Explorations | 3 | 5 | 4 | 0.0011 | False |  |
 | 21 | Clareson 1982, The Book of Gold’ : Gene Wolfe's Book of the New Sun | 3 | 4 | 2 | 0.0008 | True | yes |
-| 22 | Feeley 1991, Evidence of Things Not Seen | 3 | 8 | 6 | 0.0007 | True | yes |
+| 22 | Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book | 3 | 8 | 6 | 0.0007 | True | yes |
 | 23 | anon 1988, The Holy Bible. Authorized King James Version | 3 | 3 | 0 | 0.0006 | False |  |
 | 24 | Baber 1994, Gene Wolfe Interview | 3 | 6 | 1 | 0.0006 | False |  |
 | 25 | Jackson 1981, Fantasy: The Literature of Subversion | 3 | 11 | 3 | 0.0006 | False |  |
@@ -38,16 +38,16 @@ In-degree = number of distinct citing works in the corpus. PageRank/betweenness 
 | 28 | Gevers 2002, A Magus of Many Suns: An Interview with Gene Wolfe | 3 | 5 | 3 | 0.0006 | False |  |
 | 29 | Wolfe 1986, Critical Terms for Science Fiction and Fantasy: A Glossary a | 3 | 3 | 2 | 0.0005 | False |  |
 | 30 | Todorov 1973, The Fantastic: A Structural Approach to a Literary Genre | 3 | 5 | 1 | 0.0005 | False |  |
-| 31 | Greenland 1984, Review of The Shadow of the Torturer and The Claw of the Con | 3 | 11 | 3 | 0.0005 | False |  |
-| 32 | Wright 1996, God-Games: Cosmic Conspiracies and Narrative Sleights in Gen | 3 | 9 | 6 | 0.0005 | True |  |
-| 33 | Rose 1976, Alien Encounters: Anatomy of Science Fiction. Cambridge, MA: | 3 | 8 | 0 | 0.0005 | False |  |
-| 34 | Scholes 1975, Structural Fabulation: An Essay on the Fiction of the Future | 3 | 4 | 0 | 0.0005 | False |  |
-| 35 | Malekin 1987, Remembering the Future: Gene Wolfe's The Book of the New Sun | 3 | 8 | 4 | 0.0005 | True | yes |
-| 36 | Slusser 1980, Bridges to Science Fiction: Essays Prepared for the First Ea | 3 | 4 | 0 | 0.0005 | False |  |
-| 37 | Ketterer 1974, New Worlds For Old : The Apocalyptic Imagination, Science Fi | 3 | 7 | 0 | 0.0005 | False |  |
-| 38 | Asimov 1968, Foundation and Empire | 3 | 5 | 0 | 0.0005 | False |  |
-| 39 | Wendland 1985, Science. Myth. and the Fictional Creation of Alien Worlds | 3 | 4 | 2 | 0.0005 | False |  |
-| 40 | Irwin 1976, The Game of the Impossible: A Rhetoric of Fantasy | 3 | 3 | 0 | 0.0005 | False |  |
+| 31 | Michael 1987, High Tech and High Sorcery: Some Discriminations between Sci | 3 | 3 | 1 | 0.0005 | False |  |
+| 32 | Greenland 1984, Review of The Shadow of the Torturer and The Claw of the Con | 3 | 11 | 3 | 0.0005 | False |  |
+| 33 | Wright 1996, God-Games: Cosmic Conspiracies and Narrative Sleights in Gen | 3 | 9 | 6 | 0.0005 | True |  |
+| 34 | Rose 1976, Alien Encounters: Anatomy of Science Fiction. Cambridge, MA: | 3 | 8 | 0 | 0.0005 | False |  |
+| 35 | Scholes 1975, Structural Fabulation: An Essay on the Fiction of the Future | 3 | 4 | 0 | 0.0005 | False |  |
+| 36 | Malekin 1987, Remembering the Future: Gene Wolfe's The Book of the New Sun | 3 | 8 | 4 | 0.0005 | True | yes |
+| 37 | Slusser 1980, Bridges to Science Fiction: Essays Prepared for the First Ea | 3 | 4 | 0 | 0.0005 | False |  |
+| 38 | Ketterer 1974, New Worlds For Old : The Apocalyptic Imagination, Science Fi | 3 | 7 | 0 | 0.0005 | False |  |
+| 39 | Asimov 1968, Foundation and Empire | 3 | 5 | 0 | 0.0005 | False |  |
+| 40 | Wendland 1985, Science. Myth. and the Fictional Creation of Alien Worlds | 3 | 4 | 2 | 0.0005 | False |  |
 
 ## Highest PageRank (secondary)
 
@@ -69,7 +69,7 @@ In-degree = number of distinct citing works in the corpus. PageRank/betweenness 
 - Clareson 1982, The Book of Gold’ : Gene Wolfe's Book of the New Sun — 0.0008
 - Reed n.d., Prelude to Chemistry — 0.0008
 - Wells 2004, The Island of Dr Moreau. Project Gutenberg — 0.0007
-- Feeley 1991, Evidence of Things Not Seen — 0.0007
+- Feeley 1991, The Evidence of Things Not Shown: Family Romance in The Book — 0.0007
 - Gevers 1998, The Reader as Augur: Beginnings and Endings in Gene Wolfe's  — 0.0007
 
 ## Brokers (betweenness, secondary)
@@ -84,7 +84,7 @@ In-degree = number of distinct citing works in the corpus. PageRank/betweenness 
 - Pearson 2004, Two Views: The Knight by Gene Wolfe — 0.0002
 - Carl D. Malmgren 1988, Towards a Definition of Science Fantasy — 0.0002
 - Aichele 1991, Self-Referentiality in Gene Wolfe's 'Seven American Nights — 0.0001
-- Gerlach 1999, The Rhetoric of an Impossible Object: Gods, Chems, and Scien — 0.0001
+- Gerlach 1999, The Rhetoric of an Impossible Object: Gods, Chems, and Scien — 0.0000
 - Aramini 2015, Between Light and Shadow — 0.0000
 - Andre-Driussi 2012, Gate of Horn, Book of Silk: A Guide to Gene Wolfe's The Book — 0.0000
 - Andre-Driussi 2009, The Wizard Knight Companion: A Lexicon for Gene Wolfe's The  — 0.0000
