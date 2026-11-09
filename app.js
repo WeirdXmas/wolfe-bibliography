@@ -11,6 +11,14 @@ async function load() {
   const names = ["works", "authors", "cites", "episodes", "missing", "wanted", "catalog", "wolfe", "meta"];
   const got = await Promise.all(names.map(n => fetch(`data/${n}.json`).then(r => r.json())));
   names.forEach((n, i) => D[n] = got[i]);
+  D.priv = await fetch("data/private.json").then(r => r.ok ? r.json() : null).catch(() => null);   // private build only
+  if (D.priv) {
+    D.cites.forEach((c, i) => c.d = D.priv.cite_doc[i]);
+    D.privDoc = {};
+    Object.values(D.priv.works).flat().forEach(e => D.privDoc[e.doc] = e);
+    document.querySelector("nav .sep").insertAdjacentHTML("beforebegin", '<a href="#/fulltext" class="main">Full text</a>');
+    document.querySelector(".brand span").textContent = "private copy: do not share";
+  }
   D.inc = {}; D.out = {}; D.aCites = {}; D.byAuthor = {};
   for (const c of D.cites) {
     if (c.t) (D.inc[c.t] ||= []).push(c);
@@ -71,6 +79,22 @@ function table(rows, cols, opts = {}) {
   return `<div id="${id}"></div>`;
 }
 
+// private build: links into the citing document at the cited page
+function pageLinks(doc, p) {
+  const e = D.priv && D.privDoc[doc];
+  if (!e) return "";
+  const out = [];
+  if (e.open && e.file) out.push(`<a href="${esc(e.file)}${p != null && e.ext === ".pdf" ? "#page=" + p : ""}" target="_blank">original${p != null ? " p. " + esc(p) : ""} ↗</a>`);
+  if (e.read) out.push(`<a href="${esc(e.read)}${p != null ? "#p" + p : ""}" target="_blank">text${p != null ? " p. " + esc(p) : ""} ↗</a>`);
+  return out.join(" · ");
+}
+function docList(id) {
+  const ds = D.priv && D.priv.works[id];
+  if (!ds) return "";
+  return `<div class="fulltext"><b>Full text</b> <span class="small muted">(private)</span><ul>${ds.map(e =>
+    `<li><span class="small">${esc(e.label)}${e.pages ? ` · ${e.pages} pp.` : ""}</span> ${pageLinks(e.doc, null) || '<span class="small muted">no viewable copy</span>'}</li>`).join("")}</ul></div>`;
+}
+
 function citeCard(c, side) {
   const head = side === "none" ? "" : side === "from" ? wlink(c.f) : (c.t ? wlink(c.t) : c.a.map(alink).join(", ") + ` <span class="muted small">(critic named, no specific work)</span>`);
   const bits = [];
@@ -79,6 +103,8 @@ function citeCard(c, side) {
   bits.push(c.k === "m" ? `informal mention${c.mt ? " (" + esc(c.mt.replace("_", " ")) + ")" : ""}` : "formal citation");
   if (c.st && STANCE[c.st]) bits.push(`stance: ${STANCE[c.st]}`);
   bits.push(`${esc(c.me)}${c.cf != null ? ", conf. " + c.cf : ""}${c.ms && c.ms !== "exact" ? ", match " + esc(c.ms) : ""}`);
+  const pl = c.d ? pageLinks(c.d, c.p) : "";
+  if (pl) bits.push(pl);
   return `<div class="cite">${head}${c.k === "m" ? '<span class="badge mention">mention</span>' : ""}
     ${c.x ? `<div class="ctx">“${esc(c.x)}”</div>` : ""}<div class="src">${bits.join(" · ")}</div></div>`;
 }
@@ -153,6 +179,7 @@ function itemCard(it) {
     <div class="it-meta">${names || '<span class="muted">author unknown</span>'}${it.y ? " · " + esc(it.y) : ""}${it.v ? ` · <i>${esc(it.v)}</i>` : ""}</div>
     <div class="it-tags"><span class="badge type">${esc(TYPES[it.ty] || it.ty)}</span>${st}${it.bib ? '<span class="badge bib">in bibliography</span>' : ""}
       ${it.ncw ? `<span class="small muted">cited by ${it.ncw} work${it.ncw > 1 ? "s" : ""} in the collection</span>` : ""}</div>
+    ${D.priv && D.priv.works[it.id] ? `<div class="small">${D.priv.works[it.id].slice(0, 1).map(e => pageLinks(e.doc, null)).join("")}${D.priv.works[it.id].length > 1 ? ` <span class="muted">+${D.priv.works[it.id].length - 1} more files</span>` : ""}</div>` : ""}
     ${it.sum ? `<div class="it-sum">${esc(it.sum)}</div>` : ""}
     ${it.th && it.th.length ? `<div class="it-th">${it.th.map(t => `<a class="theme" href="#/search?q=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}${(it.ap || []).length ? `<span class="small muted"> · ${esc(it.ap.join(", "))}</span>` : ""}</div>` : ""}
     ${ww.length ? `<div class="it-wolfe">${ww.slice(0, 8).map(([w, p]) => wchip(w, p)).join("")}${ww.length > 8 ? `<span class="small muted">+${ww.length - 8} more</span>` : ""}</div>` : ""}
@@ -168,6 +195,10 @@ function wolfeOptions(sel) {
 }
 
 const NEW_PAGES = {
+  fulltext() {
+    if (!D.priv) return `<p>Full-text search is only available in the private copy.</p>`;
+    return `<h1>Search the full texts</h1><p class="small muted">Searches the OCR text of every work in the collection. Each hit opens the text at that page; from there, "original ↗" opens the PDF at the same page.</p><div id="pf"></div>`;
+  },
   search() {
     const venues = {};
     D.catalog.forEach(it => { if (it.v) venues[it.v] = (venues[it.v] || 0) + 1; });
@@ -242,6 +273,13 @@ const NEW_PAGES = {
 };
 
 const NEW_AFTER = {
+  fulltext() {
+    if (!D.priv) return;
+    const go = () => new PagefindUI({element: "#pf", showSubResults: true, showImages: false, resetStyles: false});
+    if (window.PagefindUI) return go();
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "pagefind/pagefind-ui.css"; document.head.append(css);
+    const s = document.createElement("script"); s.src = "pagefind/pagefind-ui.js"; s.onload = go; document.head.append(s);
+  },
   search() {
     const ids = ["sq", "sw", "st", "sd", "sv", "sc", "ss", "sf", "so"], keys = ["q", "w", "t", "d", "v", "c", "s", "f", "o"];
     const norm = s => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "");
@@ -312,7 +350,7 @@ const pages = {
     return `<p class="small muted"><a href="#/search">Search</a></p>
       <h1>${esc(w.ti || "(untitled)")}</h1>
       <p>${byline(w) || '<span class="muted">author unknown</span>'}${w.y ? " · " + esc(w.y) : ""}${w.co ? ` · <i>${esc(w.co)}</i>` : ""}</p>
-      <p>${badges(w)} <span class="small muted">id ${esc(id)}</span></p>${catBlock(id)}
+      <p>${badges(w)} <span class="small muted">id ${esc(id)}</span></p>${catBlock(id)}${docList(id)}
       <div class="stats">
         <div class="stat"><b>${w.ncw}</b><span>citing works</span></div>
         <div class="stat"><b>${w.nc}</b><span>formal citations</span></div>

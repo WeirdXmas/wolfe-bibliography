@@ -70,3 +70,5 @@ tr.kid td:first-child { padding-left: 26px; }
 .it-th { margin: 4px 0; }
 .theme { display: inline-block; font: 12px system-ui, sans-serif; padding: 1px 8px; margin: 2px 4px 2px 0; border-radius: 10px; background: #f3efe6; color: #6b5a2e; text-decoration: none; }
 .summary { background: #fff; border-left: 3px solid var(--accent); padding: 4px 16px; margin: 12px 0; }
+.fulltext { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; margin: 12px 0; }
+.fulltext ul { margin: 4px 0; padding-left: 18px; }
