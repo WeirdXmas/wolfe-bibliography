@@ -8,7 +8,7 @@ const EPISODES = {cyriaca: "Cyriaca's story", talos_play: "Talos's play", brown_
 const STANCE = {agrees: "agrees", disagrees: "disagrees", builds_on: "builds on", neutral: "neutral", unclear: ""};
 
 async function load() {
-  const names = ["works", "authors", "cites", "episodes", "missing", "wanted", "meta"];
+  const names = ["works", "authors", "cites", "episodes", "missing", "wanted", "catalog", "wolfe", "meta"];
   const got = await Promise.all(names.map(n => fetch(`data/${n}.json`).then(r => r.json())));
   names.forEach((n, i) => D[n] = got[i]);
   D.inc = {}; D.out = {}; D.aCites = {}; D.byAuthor = {};
@@ -34,6 +34,7 @@ async function load() {
     return {id, name, nworks: ws.length, ncw: citing.size, ment: (D.aCites[id] || []).length +
             ws.reduce((s, w) => s + w.nm, 0), corpus: ws.some(w => w.inc)};
   }).filter(c => c.id !== "wolfe_g" || true);
+  prepCatalog();
   window.addEventListener("hashchange", route);
   setupSearch();
   route();
@@ -93,9 +94,189 @@ function grouped(list, keyf, side) {
   }).join("");
 }
 
+
+// ---------- catalogue (search + by Wolfe work)
+let Q = {};
+const TYPES = {article: "Article / chapter", book: "Book", review: "Review", interview: "Interview", thesis: "Thesis",
+               web: "Web / Substack", other: "Other / unknown"};
+const SRC = {corpus: "Full text in our collection", bibliography: "In the bibliography", cited: "Known from citations",
+             lead: "New lead"};
+const WKIND = {novel: "Novels", series: "Novels", omnibus: "Novels", novella: "Stories & novellas",
+               story: "Stories & novellas", collection: "Collections, essays & letters", essays: "Collections, essays & letters",
+               letters: "Collections, essays & letters"};
+
+function prepCatalog() {
+  D.wolfeById = Object.fromEntries(D.wolfe.map(w => [w.id, w]));
+  D.wolfeKids = {};
+  D.wolfe.forEach(w => { if (w.part) (D.wolfeKids[w.part] ||= []).push(w.id); });
+  D.catById = {};
+  D.byWolfe = {};
+  for (const it of D.catalog) {
+    D.catById[it.id] = it;
+    it.names = it.a ? it.a.map(a => D.authors[a]).filter(Boolean) : (it.an ? it.an.split(/;\s*/) : []);
+    it.wset = new Set();
+    for (const [w, p] of it.ww) {
+      it.wset.add(w);
+      const par = D.wolfeById[w] && D.wolfeById[w].part;
+      if (par) it.wset.add(par);
+      (D.byWolfe[w] ||= []).push([it, p]);
+    }
+    it.dec = /^\d{4}/.test(it.y || "") ? it.y.slice(0, 3) + "0s" : "";
+    it.ncw = (D.works[it.id] || {}).ncw || 0;
+    it.hay = [it.ti, it.names.join(" "), it.v, TYPES[it.ty],
+              ...it.ww.map(([w]) => (D.wolfeById[w] || {}).ti)].join(" ").toLowerCase()
+              .normalize("NFKD").replace(/[̀-ͯ]/g, "");
+  }
+}
+
+// every catalogue item that discusses a Wolfe work or one of its volumes: [[item, prominence]]
+function aboutWolfe(id) {
+  const m = new Map();
+  for (const k of [id, ...(D.wolfeKids[id] || [])])
+    for (const [it, p] of D.byWolfe[k] || []) m.set(it, Math.max(m.get(it) || 0, p));
+  return [...m];
+}
+
+const wchip = (w, p) => D.wolfeById[w] ? `<a class="chip${p > 1 ? " main" : ""}" href="#/wolfework/${encodeURIComponent(w)}" title="${p > 1 ? "a main subject" : "also discussed"}">${esc(D.wolfeById[w].ti)}</a>` : "";
+function itemTitle(it) {
+  if (D.works[it.id]) return `<a href="#/work/${encodeURIComponent(it.id)}">${esc(it.ti || "(untitled)")}</a>`;
+  if (it.url) return `<a href="${esc(it.url)}" rel="noopener" target="_blank">${esc(it.ti)}</a> <span class="small muted">↗</span>`;
+  return esc(it.ti || "(untitled)");
+}
+function itemCard(it) {
+  const names = it.a ? it.a.map(alink).filter(Boolean).join(", ") : esc(it.an || "");
+  const st = it.ft ? `<span class="badge corpus">full text in collection</span>`
+    : it.st && it.st !== "wanted" ? `<span class="badge">${esc(it.st.replace("_", " "))}</span>`
+    : it.src === "lead" ? `<span class="badge mention">new lead</span>` : it.st === "wanted" ? `<span class="badge">wanted</span>` : "";
+  const ww = it.ww.slice().sort((a, b) => b[1] - a[1]);
+  return `<div class="item"><div class="it-title">${itemTitle(it)}</div>
+    <div class="it-meta">${names || '<span class="muted">author unknown</span>'}${it.y ? " · " + esc(it.y) : ""}${it.v ? ` · <i>${esc(it.v)}</i>` : ""}</div>
+    <div class="it-tags"><span class="badge type">${esc(TYPES[it.ty] || it.ty)}</span>${st}${it.bib ? '<span class="badge bib">in bibliography</span>' : ""}
+      ${it.ncw ? `<span class="small muted">cited by ${it.ncw} work${it.ncw > 1 ? "s" : ""} in the collection</span>` : ""}</div>
+    ${ww.length ? `<div class="it-wolfe">${ww.slice(0, 8).map(([w, p]) => wchip(w, p)).join("")}${ww.length > 8 ? `<span class="small muted">+${ww.length - 8} more</span>` : ""}</div>` : ""}
+  </div>`;
+}
+
+function wolfeOptions(sel) {
+  const groups = {};
+  D.wolfe.filter(w => aboutWolfe(w.id).length).forEach(w => (groups[WKIND[w.kind] || "Other"] ||= []).push(w));
+  return `<option value="">any Wolfe work</option>` + Object.entries(groups).map(([g, ws]) =>
+    `<optgroup label="${g}">${ws.sort((a, b) => (a.y || "").localeCompare(b.y || "")).map(w =>
+      `<option value="${w.id}" ${w.id === sel ? "selected" : ""}>${w.part ? "  " : ""}${esc(w.ti)}${w.y ? " (" + esc(w.y) + ")" : ""}</option>`).join("")}</optgroup>`).join("");
+}
+
+const NEW_PAGES = {
+  search() {
+    const venues = {};
+    D.catalog.forEach(it => { if (it.v) venues[it.v] = (venues[it.v] || 0) + 1; });
+    const decs = [...new Set(D.catalog.map(it => it.dec).filter(Boolean))].sort();
+    const opt = (v, l, cur) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(l)}</option>`;
+    return `<h1>Search Wolfe scholarship</h1>
+      <p class="small muted">${D.catalog.length} pieces of writing about Gene Wolfe: criticism, reviews, interviews, theses, books and web essays.
+      ${D.catalog.filter(i => i.ft).length} are in our collection in full; the rest come from the bibliography, from citations in those works, or from new leads.</p>
+      <div class="searchbar"><input id="sq" type="search" placeholder="title, critic, venue, Wolfe work…" value="${esc(Q.q || "")}" autofocus></div>
+      <div class="filters">
+        <select id="sw">${wolfeOptions(Q.w)}</select>
+        <select id="st"><option value="">any type</option>${Object.entries(TYPES).map(([k, v]) => opt(k, v, Q.t)).join("")}</select>
+        <select id="sd"><option value="">any decade</option>${decs.map(d => opt(d, d, Q.d)).join("")}</select>
+        <select id="sv"><option value="">any venue</option>${Object.entries(venues).filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1]).map(([v, n]) => opt(v, `${v} (${n})`, Q.v)).join("")}</select>
+        <input id="sc" type="text" placeholder="critic" value="${esc(Q.c || "")}" list="critlist">
+        <datalist id="critlist">${[...new Set(D.catalog.flatMap(i => i.names))].sort().map(n => `<option value="${esc(n)}">`).join("")}</datalist>
+        <select id="ss"><option value="">any source</option>${Object.entries(SRC).map(([k, v]) => opt(k, v, Q.s)).join("")}</select>
+        <label><input type="checkbox" id="sf" ${Q.f ? "checked" : ""}> full text only</label>
+        <select id="so">${[["rel", "sort: relevance"], ["new", "newest first"], ["old", "oldest first"], ["cited", "most cited"], ["title", "title A–Z"]].map(([k, v]) => opt(k, v, Q.o || "rel")).join("")}</select>
+        <a href="#/search" class="small">clear</a>
+      </div>
+      <p id="scount" class="small muted"></p><div id="sres"></div>`;
+  },
+
+  wolfe() {
+    const groups = {};
+    D.wolfe.filter(w => !w.part || !D.wolfeById[w.part]).forEach(w => (groups[WKIND[w.kind] || "Other"] ||= []).push(w));
+    const row = (w, kid) => {
+      const n = aboutWolfe(w.id), main = n.filter(([, p]) => p > 1).length, ft = n.filter(([it]) => it.ft).length;
+      const pw = D.works["wolfe:" + w.id];
+      return `<tr class="${kid ? "kid" : ""}"><td>${n.length ? `<a href="#/wolfework/${encodeURIComponent(w.id)}">${esc(w.ti)}</a>` : esc(w.ti)}</td><td>${esc(w.y)}</td>
+        <td class="n">${n.length || ""}</td><td class="n">${main || ""}</td><td class="n">${ft || ""}</td><td class="n">${pw && pw.ncw ? pw.ncw : ""}</td></tr>`;
+    };
+    return `<h1>Scholarship by Wolfe work</h1>
+      <p class="small muted">For each of Wolfe's books and stories: how many pieces in the catalogue discuss it, and how many have it as a main subject.
+      For works in our collection this is read from the full text (titles, character names and formal citations); for the others, from their titles.
+      Series pages include their volumes.</p>
+      ${Object.entries(groups).map(([g, ws]) => `<h2>${g}</h2><table><thead><tr><th>Work</th><th>Year</th><th class="n">Pieces</th><th class="n">Main subject</th><th class="n">Full text</th><th class="n" title="corpus works citing it formally">Cited by</th></tr></thead><tbody>
+        ${ws.sort((a, b) => (a.y || "9").localeCompare(b.y || "9")).map(w => row(w) + (D.wolfeKids[w.id] || []).map(k => row(D.wolfeById[k], true)).join("")).join("")}</tbody></table>`).join("")}
+      <p class="small"><a href="#/wolfecites">Formal citations of Wolfe's books, and selected episodes →</a></p>`;
+  },
+
+  wolfework(id) {
+    const w = D.wolfeById[id];
+    if (!w) return `<p>Unknown Wolfe work.</p>`;
+    const items = aboutWolfe(id).sort((a, b) => b[1] - a[1] || b[0].ft - a[0].ft || (a[0].y || "9").localeCompare(b[0].y || "9"));
+    const main = items.filter(([, p]) => p > 1).map(([it]) => it), sec = items.filter(([, p]) => p <= 1).map(([it]) => it);
+    const pw = D.works["wolfe:" + id], par = w.part && D.wolfeById[w.part], kids = D.wolfeKids[id] || [];
+    const byType = {};
+    items.forEach(([it]) => byType[it.ty] = (byType[it.ty] || 0) + 1);
+    let eps = "";
+    if (id === "botns") {
+      const E = {}; D.episodes.forEach(e => (E[e.e] ||= []).push(e));
+      eps = `<h2>Episodes</h2><p class="small muted">Passages in the criticism that discuss these embedded stories (keyword search, so some hits are incidental).</p>
+        <ul>${Object.entries(EPISODES).map(([k, n]) => `<li>${n}: ${(E[k] || []).length} passages in ${new Set((E[k] || []).map(e => e.w)).size} works</li>`).join("")}</ul>
+        <p class="small"><a href="#/wolfecites">Read the passages →</a></p>`;
+    }
+    return `<p class="small muted"><a href="#/wolfe">By Wolfe work</a>${par ? ` › <a href="#/wolfework/${encodeURIComponent(par.id)}">${esc(par.ti)}</a>` : ""}</p>
+      <h1><i>${esc(w.ti)}</i></h1><p class="muted">${esc(w.y)} · ${esc(w.kind)}</p>
+      ${kids.length ? `<p class="small">Volumes: ${kids.map(k => `<a href="#/wolfework/${encodeURIComponent(k)}">${esc(D.wolfeById[k].ti)}</a>`).join(" · ")}</p>` : ""}
+      <div class="stats">
+        <div class="stat"><b>${items.length}</b><span>pieces discuss it</span></div>
+        <div class="stat"><b>${main.length}</b><span>as a main subject</span></div>
+        <div class="stat"><b>${items.filter(([it]) => it.ft).length}</b><span>full text in collection</span></div>
+        ${pw ? `<div class="stat"><b>${pw.ncw}</b><span><a href="#/work/${encodeURIComponent(pw.id)}">cite it formally</a></span></div>` : ""}
+      </div>
+      <p class="small muted">${Object.entries(byType).map(([t, n]) => `${TYPES[t]}: ${n}`).join(" · ")} · <a href="#/search?w=${encodeURIComponent(id)}">search within these →</a></p>
+      ${main.length ? `<h2>Main subject</h2>${main.map(itemCard).join("")}` : ""}
+      ${sec.length ? `<h2>Also discussed in</h2>${sec.map(itemCard).join("")}` : ""}
+      ${!items.length ? `<p class="muted">Nothing in the catalogue discusses this work yet.</p>` : ""}${eps}`;
+  },
+};
+
+const NEW_AFTER = {
+  search() {
+    const ids = ["sq", "sw", "st", "sd", "sv", "sc", "ss", "sf", "so"], keys = ["q", "w", "t", "d", "v", "c", "s", "f", "o"];
+    const norm = s => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "");
+    const upd = (push) => {
+      const v = Object.fromEntries(ids.map((id, i) => [keys[i], id === "sf" ? ($("#sf").checked ? "1" : "") : $("#" + id).value.trim()]));
+      const terms = norm(v.q).split(/\s+/).filter(Boolean), crit = norm(v.c);
+      let rows = D.catalog.filter(it => (!v.w || it.wset.has(v.w)) && (!v.t || it.ty === v.t) && (!v.d || it.dec === v.d) &&
+        (!v.v || it.v === v.v) && (!v.s || it.src === v.s) && (!v.f || it.ft) &&
+        (!crit || it.names.some(n => norm(n).includes(crit))) && terms.every(t => it.hay.includes(t)));
+      const score = it => (terms.filter(t => norm(it.ti || "").includes(t)).length * 3) + (it.ft ? 2 : 0) +
+        (v.w ? (it.ww.find(([w]) => w === v.w) || [0, 0])[1] * 2 : 0) + Math.log1p(it.ncw);
+      const yr = it => +String(it.y || "").slice(0, 4) || 0;
+      const S = {rel: (a, b) => score(b) - score(a), new: (a, b) => yr(b) - yr(a), old: (a, b) => (yr(a) || 9999) - (yr(b) || 9999),
+                 cited: (a, b) => b.ncw - a.ncw, title: (a, b) => (a.ti || "").localeCompare(b.ti || "")};
+      rows = rows.sort(S[v.o || "rel"]);
+      $("#scount").textContent = `${rows.length} result${rows.length === 1 ? "" : "s"}${rows.length > 150 ? " (first 150 shown)" : ""}`;
+      $("#sres").innerHTML = rows.slice(0, 150).map(itemCard).join("") || `<p class="muted">Nothing matches.</p>`;
+      const qs = new URLSearchParams(Object.entries(v).filter(([k, x]) => x && !(k === "o" && x === "rel"))).toString();
+      history.replaceState(null, "", "#/search" + (qs ? "?" + qs : ""));
+    };
+    ids.forEach(id => $("#" + id).addEventListener(id === "sq" || id === "sc" ? "input" : "change", () => upd()));
+    upd();
+  },
+};
+
+function catBlock(id) {
+  const it = D.catById[id];
+  if (!it) return "";
+  const ww = it.ww.slice().sort((a, b) => b[1] - a[1]);
+  return `<p><span class="badge type">${esc(TYPES[it.ty])}</span>${it.ft ? '<span class="badge corpus">full text in collection</span>' : it.st ? `<span class="badge">${esc(it.st.replace("_", " "))}</span>` : ""}</p>
+    ${ww.length ? `<p class="small">Discusses: ${ww.map(([w, p]) => wchip(w, p)).join("")}</p>` : ""}`;
+}
+
 // ---------- pages
 const pages = {
-  home() {
+  home() { return pages.search(); },
+  overview() {
     const m = D.meta, sec = Object.values(D.works).filter(w => w.k !== "wolfe_primary");
     const top = sec.filter(w => w.ncw > 1).sort((a, b) => b.ncw - a.ncw || b.pr - a.pr).slice(0, 15);
     const prim = Object.values(D.works).filter(w => w.k === "wolfe_primary").sort((a, b) => b.ncw - a.ncw).slice(0, 8);
@@ -115,17 +296,17 @@ const pages = {
       <p><a href="#/works">All works →</a> · <a href="#/graph">Explore the graph →</a></p>
       <h2>Most-discussed Wolfe books</h2>
       <ol>${prim.map(w => `<li>${wlink(w.id)} <span class="small muted">— ${w.ncw} citing works</span></li>`).join("")}</ol>
-      <p><a href="#/wolfe">All of Wolfe's books, and selected episodes →</a></p>`;
+      <p><a href="#/wolfecites">All of Wolfe's books, and selected episodes →</a></p>`;
   },
 
   work(id) {
     const w = D.works[id];
     if (!w) return `<p>Unknown work.</p>`;
     const inc = D.inc[id] || [], out = D.out[id] || [];
-    return `<p class="small muted"><a href="#/works">Works</a></p>
+    return `<p class="small muted"><a href="#/search">Search</a></p>
       <h1>${esc(w.ti || "(untitled)")}</h1>
       <p>${byline(w) || '<span class="muted">author unknown</span>'}${w.y ? " · " + esc(w.y) : ""}${w.co ? ` · <i>${esc(w.co)}</i>` : ""}</p>
-      <p>${badges(w)} <span class="small muted">id ${esc(id)}</span></p>
+      <p>${badges(w)} <span class="small muted">id ${esc(id)}</span></p>${catBlock(id)}
       <div class="stats">
         <div class="stat"><b>${w.ncw}</b><span>citing works</span></div>
         <div class="stat"><b>${w.nc}</b><span>formal citations</span></div>
@@ -166,7 +347,7 @@ const pages = {
       <div class="filters"><input type="text" id="cf" placeholder="filter name"><label><input type="checkbox" id="cc"> wrote a corpus work</label></div><div id="ct"></div>`;
   },
 
-  wolfe() {
+  wolfecites() {
     const rows = Object.values(D.works).filter(w => w.k === "wolfe_primary" && (w.ncw || w.nc));
     const eps = {};
     D.episodes.forEach(e => (eps[e.e] ||= []).push(e));
@@ -321,6 +502,8 @@ const after = {
     ["#qf", "#qs", "#qt", "#qw"].forEach(s => $(s).oninput = upd); upd();
   },
   graph: drawGraph,
+  home() { after.search(); },
+  search() { after.search(); },
 };
 
 function drawGraph() {
@@ -368,18 +551,25 @@ function drawGraph() {
   draw();
 }
 
+Object.assign(pages, NEW_PAGES);
+Object.assign(after, NEW_AFTER);
+
 // ---------- router & search
 async function route() {
-  const [, page = "", ...rest] = location.hash.slice(1).split("/");
+  const [path, qs = ""] = location.hash.slice(1).split("?");
+  const [, page = "", ...rest] = path.split("/");
   const arg = decodeURIComponent(rest.join("/"));
+  Q = Object.fromEntries(new URLSearchParams(qs));
   const fn = pages[page || "home"] || pages.home;
   $("#app").className = page === "graph" ? "wide" : "";
   $("#app").innerHTML = await fn(arg);
-  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#/" + page));
+  const tab = page === "" || page === "home" ? "search" : page === "wolfework" ? "wolfe" : page;
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#/" + tab));
   (after[page] || (() => {}))();
   if (page !== "graph") window.scrollTo(0, 0);
   const w = D.works[arg], c = D.authors[arg];
-  document.title = (w ? w.ti + " — " : c ? c + " — " : "") + "Gene Wolfe Scholarship — Citation Graph";
+  const ww = page === "wolfework" && D.wolfeById[arg];
+  document.title = (w ? w.ti + " — " : c ? c + " — " : ww ? ww.ti + " — " : "") + "Gene Wolfe Scholarship";
 }
 
 function setupSearch() {
@@ -396,6 +586,8 @@ function setupSearch() {
   };
   document.addEventListener("click", e => { if (!res.contains(e.target) && e.target !== box) res.style.display = "none"; });
   res.onclick = () => { res.style.display = "none"; box.value = ""; };
+  box.onkeydown = e => { if (e.key === "Enter" && box.value.trim()) {
+    location.hash = "#/search?" + new URLSearchParams({q: box.value.trim()}); res.style.display = "none"; box.value = ""; } };
 }
 
 load();

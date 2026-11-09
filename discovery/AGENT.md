@@ -16,6 +16,7 @@ Exclude:
 - AI-generated content farms
 - other Wolfes (Thomas, Tom, Gary K., General James)
 - Severian of Gabala and the Severan dynasty
+- episodes of the *ReReading Wolfe* podcast (rereadingwolfe.podbean.com and its other listings). It's the project owner's own podcast, so always skip it.
 
 ## Hard rules
 

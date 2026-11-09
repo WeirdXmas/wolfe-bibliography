@@ -52,3 +52,17 @@ td.n, th.n { text-align: right; }
 .md table { margin: 10px 0; }
 .md blockquote { margin: 6px 0 6px 12px; padding-left: 10px; border-left: 3px solid var(--line); color: #444; }
 @media (max-width: 760px) { #search { width: 100%; } #results { left: 12px; right: 12px; width: auto; } #gside { display: none; } }
+nav a.main { font-weight: 600; font-size: 15px; }
+nav .sep { display: inline-block; width: 1px; height: 14px; background: var(--line); margin: 0 14px 0 0; vertical-align: middle; }
+.searchbar input { width: 100%; font: 18px system-ui, sans-serif; padding: 10px 14px; border: 1px solid #cfccc4; border-radius: 8px; }
+.filters select { font: 14px system-ui, sans-serif; padding: 3px 6px; border: 1px solid var(--line); border-radius: 4px; max-width: 260px; background: #fff; }
+.item { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
+.it-title { font-size: 17px; font-weight: bold; }
+.it-title a { text-decoration: none; }
+.it-meta { font: 14px system-ui, sans-serif; color: #444; margin: 2px 0 4px; }
+.it-tags, .it-wolfe { margin-top: 4px; }
+.badge.type { background: #ece9f3; color: #4b3f72; }
+.chip { display: inline-block; font: 12px system-ui, sans-serif; padding: 1px 8px; margin: 2px 4px 2px 0; border-radius: 10px;
+        border: 1px solid #cfe0cb; color: var(--green); text-decoration: none; font-style: italic; background: #fff; }
+.chip.main { background: #e0eedd; font-weight: 600; }
+tr.kid td:first-child { padding-left: 26px; }
