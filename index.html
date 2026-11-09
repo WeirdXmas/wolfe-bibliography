@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gene Wolfe Scholarship — Citation Graph</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a href="#/" class="brand">Wolfe Scholarship <span>citation graph</span></a>
+  <nav>
+    <a href="#/works">Works</a>
+    <a href="#/critics">Critics</a>
+    <a href="#/wolfe">Wolfe's books</a>
+    <a href="#/graph">Graph</a>
+    <a href="#/missing">Not in the bibliography</a>
+    <a href="#/reports">Reports</a>
+    <a href="#/about">About</a>
+  </nav>
+  <input id="search" type="search" placeholder="Search works and critics…" autocomplete="off">
+  <div id="results"></div>
+</header>
+<main id="app"><p class="muted">Loading…</p></main>
+<footer>Metadata and short citation contexts only; no full text of any work is published here. <a href="#/about">Method &amp; sources</a></footer>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

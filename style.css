@@ -1,0 +1,54 @@
+:root { --ink: #1d1d1f; --muted: #6e6e73; --line: #e3e1dc; --bg: #fbfaf7; --accent: #7a2e1f; --blue: #2f5d8a; --green: #3b7a3b; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.55 Georgia, "Iowan Old Style", serif; color: var(--ink); background: var(--bg); }
+header { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid var(--line);
+         display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 10px 24px; }
+.brand { font-weight: bold; color: var(--accent); text-decoration: none; font-size: 18px; }
+.brand span { font-weight: normal; color: var(--muted); font-size: 14px; }
+nav a { margin-right: 14px; color: var(--ink); text-decoration: none; font: 14px system-ui, sans-serif; }
+nav a:hover, nav a.on { color: var(--accent); }
+#search { margin-left: auto; width: 280px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; font: 14px system-ui, sans-serif; }
+#results { position: absolute; right: 24px; top: 52px; width: 420px; max-height: 60vh; overflow: auto; background: #fff;
+           border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.08); display: none; }
+#results a { display: block; padding: 6px 10px; text-decoration: none; color: var(--ink); font-size: 14px; border-bottom: 1px solid #f3f1ec; }
+#results a:hover { background: #f6f3ee; }
+main { max-width: 1000px; margin: 0 auto; padding: 24px; min-height: 70vh; }
+main.wide { max-width: none; padding: 0; }
+footer { text-align: center; color: var(--muted); font: 13px system-ui, sans-serif; padding: 24px; border-top: 1px solid var(--line); }
+h1 { font-size: 28px; line-height: 1.25; margin: 8px 0 4px; }
+h2 { font-size: 20px; margin: 28px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+h3 { font-size: 16px; margin: 16px 0 4px; }
+a { color: var(--blue); }
+.muted { color: var(--muted); }
+.small { font: 13px system-ui, sans-serif; }
+.badge { display: inline-block; font: 12px system-ui, sans-serif; padding: 1px 7px; border-radius: 10px; margin-right: 4px; background: #eee; color: #444; }
+.badge.corpus { background: #f4e3de; color: var(--accent); }
+.badge.bib { background: #dfe8f1; color: var(--blue); }
+.badge.wolfe { background: #e0eedd; color: var(--green); }
+.badge.mention { background: #f1ecdc; color: #7a6320; }
+.stats { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.stat { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 16px; min-width: 140px; }
+.stat b { display: block; font-size: 24px; color: var(--accent); }
+.stat span { font: 13px system-ui, sans-serif; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font: 14px system-ui, sans-serif; background: #fff; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: #f3f1ec; cursor: pointer; user-select: none; white-space: nowrap; }
+td.n, th.n { text-align: right; }
+.cite { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; margin: 8px 0; }
+.cite .ctx { font-style: italic; color: #333; margin-top: 4px; }
+.cite .src { font: 13px system-ui, sans-serif; color: var(--muted); }
+.filters { font: 14px system-ui, sans-serif; margin: 10px 0; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.filters input[type=text] { padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; }
+#graphwrap { display: flex; height: calc(100vh - 120px); }
+#gside { width: 340px; padding: 14px; overflow-y: auto; border-right: 1px solid var(--line); background: #fff; font: 14px system-ui, sans-serif; }
+#gmain { flex: 1; position: relative; }
+#gmain svg { width: 100%; height: 100%; }
+#gmain line { stroke: #999; stroke-opacity: .35; }
+#gmain line.m { stroke-dasharray: 3 2; }
+#gmain circle { stroke: #fff; stroke-width: 1; cursor: pointer; }
+#gmain .dim { opacity: .07; }
+#gmain text { font: 10px system-ui, sans-serif; pointer-events: none; fill: #333; }
+.legend span { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 4px 0 10px; }
+.md table { margin: 10px 0; }
+.md blockquote { margin: 6px 0 6px 12px; padding-left: 10px; border-left: 3px solid var(--line); color: #444; }
+@media (max-width: 760px) { #search { width: 100%; } #results { left: 12px; right: 12px; width: auto; } #gside { display: none; } }
